@@ -1,0 +1,1 @@
+(once|twice|thrice|Once|Twice|Thrice) (daily)

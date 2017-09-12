@@ -35,7 +35,7 @@ public class TempExpExtract {
     private final static String ruleFiles = "./rules/";
     private static String defs_sutime = ruleFiles + "defs.sutime.txt";
     private static String holiday_sutime = ruleFiles + "english.holidays.sutime.txt";
-    private static String _sutime = ruleFiles + "english.sutime.txt";
+    private static String _sutime = ruleFiles + "english.sutime.txt.my";
 
     private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 

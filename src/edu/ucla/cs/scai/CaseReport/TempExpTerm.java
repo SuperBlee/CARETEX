@@ -15,6 +15,12 @@ public class TempExpTerm {
     private String _end;
     private Temporal temporal;
 
+    public TempExpTerm(String name, String start, String end){
+        _text = name;
+        _end = end;
+        _start = start;
+    }
+
     public TempExpTerm(String name, Temporal temp, String start, String end){
         _text = name;
         _start = start;
@@ -25,9 +31,9 @@ public class TempExpTerm {
     public void print(){
         System.out.println("===============");
         System.out.println("Token Text: " + _text);
-        System.out.println("Temporal Value : " + temporal.toString());
-        System.out.println("Timex : " + temporal.getTimexValue());
-        System.out.println("Type : " + temporal.getTimexType());
+//        System.out.println("Temporal Value : " + temporal.toString());
+//        System.out.println("Timex : " + temporal.getTimexValue());
+//        System.out.println("Type : " + temporal.getTimexType());
         System.out.println("Start : " + _start);
         System.out.println("End : " + _end);
     }
@@ -35,8 +41,8 @@ public class TempExpTerm {
     public String toString(){
         return  getStart() + "\t" +
                 getEnd() + "\t" +
-                getTempValue() + "\t" +
-                getType() + "\t" +
+//                getTempValue() + "\t" +
+//                getType() + "\t" +
                 getText() + "\n";
     }
 
@@ -44,9 +50,9 @@ public class TempExpTerm {
         JSONObject jsonObj = new JSONObject();
         jsonObj.put("Start", getStart());
         jsonObj.put("End", getEnd());
-        jsonObj.put("Type", getType());
-        jsonObj.put("Value", getTempValue());
-        jsonObj.put("Timex", getTimex());
+//        jsonObj.put("Type", getType());
+//        jsonObj.put("Value", getTempValue());
+//        jsonObj.put("Timex", getTimex());
         jsonObj.put("Text", getText());
         return jsonObj;
     }

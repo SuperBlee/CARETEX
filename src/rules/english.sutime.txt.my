@@ -14,7 +14,12 @@
 
   $INT_TIMES = ( $INT /times/ | once | twice | thrice );
   $REL_MOD = ( /the/? /next|following|last|previous/ | /this/ /coming|past/? | /the/ /coming|past/ );
+
+  # @Modified start
   $FREQ_MOD = ( /each/ | /every/ $NUM_ORD | /every/ /other|alternate|alternating/? | /alternate|alternating/ );
+  # $FREQ_MOD = ( /each/ | /every/ $NUM_ORD | /every/ /other|alternate|alternating/? | /alternate|alternating/ | $INT_TIMES) ;
+  # @Modify over.
+
   $EARLY_LATE_MOD = ( /late|early|mid-?/ | /the/? /beginning|start|dawn|middle|end/ /of/ | /late|early/ /in|on/ );
   $APPROX_MOD = ( /about|around|some|exactly|precisely/ );
   $YEAR = ( /[012]\d\d\d/ | /'\d\d/ | /'/ /\d\d/ | /\w+teen|twenty/ [ { numcompvalue<100 } & { numcompvalue>0 } & $INT ] );
@@ -22,7 +27,7 @@
   $hasTemporal = "( { temporal::EXISTS } & {{ temporal.value != NON_TEMPORAL }} & !{{ tags[\"TIMEZONE\"] }} )"
 
   # Decades
-  DECADES_MAP = {
+ DECADES_MAP = {
     "twenties": "2X",
     "thirties": "3X",
     "forties": "4X",
@@ -502,6 +507,7 @@
 
   ENV.defaults["ruleType"] = "composite"
 
+  # the previous day
   { name: "temporal-composite-6b",
     priority: 20,
     pattern: ( ( $REL_MOD ) ( [ $hasTemporal & !{ temporal::IS_TIMEX_SET } ] ) ),
@@ -583,6 +589,7 @@
 
   ENV.defaults["priority"] = 0
 
+  # @Add: this rule is for the "the second day"
   { ( ($FREQ_MOD|/the/)? ($NUM_ORD) ([ { temporal::IS_TIME_UNIT } | { temporal::DAYOFWEEK } ]) ) =>
     :case{
         # Only attach ordinal to time if not prefixed by frequency modifier (e.g. every)
@@ -897,10 +904,12 @@
 	result: MakePeriodicTemporalSet($1[0].temporal, "every", 1 )
   }
 
+# i.e. Every other Tuesday.
   { name: "temporal-composite-7b",
-#    pattern: ( ( $FREQ_MOD ) ( [ $hasTemporal & !{ temporal::IS_TIMEX_SET } ] ) ),
+#   pattern: ( ( $FREQ_MOD ) ( [ $hasTemporal & !{ temporal::IS_TIMEX_SET } ] ) ),
     pattern: ( ( $FREQ_MOD ) ( [ $hasTemporal ] ) ),
-	result: MakePeriodicTemporalSet($2[0].temporal, GetTag($1[0], "PTS.quant"), GetTag($1[0], "PTS.multiple") )
+    result: MakePeriodicTemporalSet($2[0].temporal, GetTag($1[0], "PTS.quant"), GetTag($1[0], "PTS.multiple") )
+    # result: $1[0].temporal.value
   }
 
   { name: "temporal-composite-8:ranges",
@@ -908,9 +917,33 @@
     pattern: ( /from/? ( [ { temporal::IS_TIMEX_TIME } | { temporal::IS_TIMEX_DATE } ] ) /to|-/ ( [ { temporal::IS_TIMEX_TIME } |   {   temporal::IS_TIMEX_DATE } ] ) ),
 	result: TimeRange( $1[0].temporal.value, $2[0].temporal.value ) }
 
-  { name: "temporal-composite-9",
-	pattern: ( [{ temporal::IS_TIMEX_TIME }] (?: /sharp/|/exactly/|/precisely/|/on/ /the/ /dot/) ),
-    result: $0[0].temporal.value }
+   { name: "temporal-composite-9",
+	 pattern: ( [{ temporal::IS_TIMEX_TIME }] (?: /sharp/|/exactly/|/precisely/|/on/ /the/ /dot/) ),
+     result: $0[0].temporal.value }
+
+  # @Added for twice a week.
+  # { name: "temporal-composite-10",
+  # pattern: ( $INT_TIMES /a/ ( [ { temporal::IS_TIME_UNIT } ] ) ),
+  #   pattern: ($INT_TIMES),
+  # result: $0[0].temporal.value }
+  #  result: 1 }
+
+  # @Added for twice a week.
+  {name: "temporal-composite-11",
+  pattern: ( $INT_TIMES ( [ {temporal::IS_TIMEX_DURATION } ] ) ),
+  # result: MakePeriodicTemporalSet($)}
+  result: $1[0].temporal.value}
+
+  { name: "temporal-composite-12",
+   pattern: ( $INT_TIMES /$PeriodicSetRegex/ /a/ /$PeriodicSetRegex/ ),
+   result: GetTag($0[1], "PeriodicSet")
+   }
+
+   # # @Add a new rule
+   # { name: "temporal-composite-13",
+   #  pattern: ( $INT_TIMES (/.*$PeriodicSetRegex/) ),
+   #  result: GetTag($0[-1], "PeriodicSet")
+   #  }
 
   ########################################################################################################################
 

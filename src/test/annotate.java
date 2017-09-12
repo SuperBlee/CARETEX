@@ -2,6 +2,7 @@ package test;
 
 import edu.ucla.cs.scai.CaseReport.TempExpExtract;
 import edu.ucla.cs.scai.CaseReport.TempExpList;
+import edu.ucla.cs.scai.CaseReport.RegexBasedMatch;
 import edu.ucla.cs.scai.CaseReport.tools;
 import org.apache.commons.io.FilenameUtils;
 
@@ -15,11 +16,16 @@ import java.util.Iterator;
  * Main Java file of annotation
  */
 
+
+//TODO: Modify the reference date;
+//TODO:
+
 public class annotate {
     public static void main(String[] args) {
         String fileList = "./sample_data/filelist.txt";
         String folder = "./sample_data/";
         String resultDir = "./result/";
+        String regexPath = "./src/rules/regex_rules.txt";
 
         ArrayList<String> filePaths = new ArrayList<>(); // Read the file names
         System.out.println("Reading the list of input files ...");
@@ -33,7 +39,8 @@ public class annotate {
             e.printStackTrace();
         }
 
-        TempExpExtract anttr = new TempExpExtract();
+        TempExpExtract anttr = new TempExpExtract(); // The annotator, in short: anttr
+        RegexBasedMatch rgxMatch = new RegexBasedMatch();
 
         Iterator<String> fileNameIter = filePaths.iterator();
         System.out.println("Annotating the files ...");
@@ -42,8 +49,14 @@ public class annotate {
             String rmExtFile = FilenameUtils.removeExtension(nextFile); // Remove the extension
             String fullText = tools.getFullText(folder + nextFile); // Get the full text of case report
             TempExpList expList = anttr.annotateText(fullText);
-            tools.writeExpLists(resultDir + rmExtFile + ".json", expList);
-            tools.writeReadable(resultDir + rmExtFile + ".txt", expList);
+            TempExpList rgxList = rgxMatch.processText(regexPath, fullText);
+
+            // add the regex based annotator
+            TempExpList regexList = TempExpList.mergeList(expList, rgxList);
+            regexList.printList();
+
+            tools.writeExpLists(resultDir + rmExtFile + ".json", regexList);
+            tools.writeReadable(resultDir + rmExtFile + ".txt", regexList);
             System.out.println("Finished annotating " + nextFile);
         }
     }

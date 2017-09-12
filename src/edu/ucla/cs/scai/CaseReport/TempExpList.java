@@ -1,5 +1,8 @@
 package edu.ucla.cs.scai.CaseReport;
 
+import org.joda.time.Interval;
+
+import javax.swing.text.html.HTMLDocument;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -32,6 +35,19 @@ public class TempExpList {
     }
 
     public Iterator<TempExpTerm> iterator(){return ExpList.iterator(); }
+
+    public static TempExpList mergeList(TempExpList l1, TempExpList l2){
+        TempExpList res = new TempExpList();
+        Iterator<TempExpTerm> i1 = l1.iterator();
+        Iterator<TempExpTerm> i2 = l2.iterator();
+        while(i1.hasNext()){
+            res.addTerm(i1.next());
+        }
+        while(i2.hasNext()){
+            res.addTerm(i2.next());
+        }
+        return res;
+    }
 
 }
 
